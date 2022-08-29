@@ -1,21 +1,20 @@
-import requests
 import json
 
-class ApiParser:
 
+class ApiParser:
     def __init__(self, raw_json):
         self.data = json.loads(raw_json)
         self.current_data = self.data
         self.index_chain = []
         # create exit command
-        self.PARSER_COMMANDS = {
-                "index": self.index_into, 
-                "current": self.show_current_value, 
-                "values": self.display_values, 
-                "previous": self.previous_index, 
-                "help": self.get_api_commands, 
-                "type": self.type_of
-                }
+        self.COMMANDS = {
+            "index": self.index_into,
+            "current": self.get_current_value,
+            "options": self.get_options,
+            "previous": self.previous_index,
+            "help": self.get_commands,
+            "type": self.type_of,
+        }
 
     def index_into(self, index):
         if isinstance(self.current_data, list):
@@ -33,11 +32,11 @@ class ApiParser:
         self.current_data = self.current_data[index]
 
     # show current data
-    def show_current_value(self):
+    def get_current_value(self):
         return self.current_data
 
     # print the options for a list and a dictionary.
-    def display_values(self):
+    def get_options(self):
         if isinstance(self.current_data, list):
             return self.current_data
 
@@ -56,20 +55,18 @@ class ApiParser:
         for chain in self.index_chain:
             self.current_data = self.current_data[chain]
 
-    def execute_command(self, command):
-        self.iterating = True
-        if command not in self.PARSER_COMMANDS:
-            raise ValueError(f"Invaild command. \nCommands {self.get_api_commands()}")
+    def execute_command(self, command, *args, **kwargs):
+        if command not in self.COMMANDS:
+            raise ValueError(f"Invaild command. \nCommands {self.get_commands()}")
         else:
-            self.PARSER_COMMANDS[command]()
+            self.COMMANDS[command](*args, **kwargs)
 
-    def get_api_commands(self):
-        return f"Commands: {''.join([str(command) + ', ' if command != list(self.PARSER_COMMANDS)[-1] else str(command) for command in self.PARSER_COMMANDS])}"
+    def get_commands(self):
+        # add a comma between commands
+        return f"Commands: {''.join([str(command) + ', ' if command != list(self.COMMANDS)[-1] else str(command) for command in self.COMMANDS])}"
 
     def type_of(self):
         return type(self.current_data)
 
     def reset(self):
         self.current_data = self.data
-
-        
