@@ -3,7 +3,7 @@ src/__pycache__/
 test*
 *.py[cod]
 *$py.class
-
+TESTAPI/
 # C extensions
 *.so
 
